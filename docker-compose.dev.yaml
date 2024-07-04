@@ -1,0 +1,23 @@
+version: '3'
+services:
+  front:
+    container_name: front_
+    build:
+      dockerfile: ./docker-images/front/Dockerfile.Debug
+    volumes:
+      - ./front:/front:rw
+    working_dir: /front
+    ports:
+      - 5173:5173
+    networks:
+      - shared
+
+  back:
+    build:
+      dockerfile: ./docker-images/back/Dockerfile.Debug
+    volumes:
+      - ./back/:/app:rw
+      - ./front/GenApi:/app/openapi.g/front:rw
+    working_dir: /app
+
+

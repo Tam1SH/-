@@ -1,0 +1,36 @@
+# Stage 1: Build frontend
+FROM node:18 AS frontend
+WORKDIR /src/front
+
+# Копируем файлы фронтенда и собираем их
+COPY ./front ./
+RUN npm install && npm run build
+
+# Stage 2: Build backend
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS backend
+WORKDIR /src
+
+# Копируем файлы проекта и восстанавливаем зависимости
+COPY ./back/*.csproj ./back/
+RUN dotnet restore ./back/
+
+# Копируем статические файлы фронтенда из стадии frontend
+COPY --from=frontend /src/front/dist ./back/ClientAppDist
+
+# Возвращаемся к директории бэкенда и собираем его
+WORKDIR /src/back
+COPY ./back ./
+RUN dotnet publish -c Release -o out
+
+# Stage 3: Final runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+WORKDIR /back
+
+# Копируем собранное приложение из стадии backend
+COPY --from=backend /src/back/out ./
+
+# Копируем ClientAppDist из стадии backend
+COPY --from=backend /src/back/ClientAppDist ./ClientAppDist
+
+# Устанавливаем точку входа
+ENTRYPOINT ["dotnet", "back.dll"]

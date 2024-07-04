@@ -1,0 +1,13 @@
+version: '3'
+name: project
+services:
+  back:
+    container_name: back
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker-images/back/Dockerfile.Prod
+    ports:
+      - 3241:80
+    networks:
+      - shared

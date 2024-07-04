@@ -1,0 +1,33 @@
+
+version: '3'
+name: project
+services:
+  back:
+    container_name: back
+    restart: always
+    expose:
+      - 80
+    ports:
+      - 3241:80
+    networks:
+      - shared
+
+  db:
+    container_name: postgres
+    image: postgres:10
+    expose:
+      - 5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: something_secure_words_and_signs
+    networks:
+      - shared
+
+
+volumes:
+  db: {}
+  
+networks:
+  shared: {}

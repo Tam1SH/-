@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 as base
+
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get install -y nodejs
+
+RUN apt-get update && apt-get install -y openjdk-11-jdk
+
+RUN dotnet tool install --global dotnet-ef --version 6.*
+
+RUN npm install -g @openapitools/openapi-generator-cli
+
+
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+ENTRYPOINT dotnet watch run --urls http://*:80
